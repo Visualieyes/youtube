@@ -4,22 +4,44 @@ import random
 import string
 import json
 
-chars = string.ascii_letters + string.digits + '!@#$%^&*()'
+#Store Socks proxies in a dictionary to configure hide source of outgoing request    
+proxies_dict = {										
+	'http' : 'socks5://152.1.204.8:1080',
+	'https' : 'socks5://152.1.204.8:1080'
+}
+
+#List of common email domains, adds variety to the spam/scam
+email_domain = ["@hotmail.com", "@gmail.com", "@outlook.com", "@yahoo.com"]
+
+#For generating passwords
+#chars = string.ascii_letters + string.digits + '!@#$%^&*()'  #uncomment if page requires passwords info
+
 random.seed = (os.urandom(1024))
 
-url = 'http://craigslist.pottsfam.com/index872dijasydu2iuad27aysdu2yytaus6d2ajsdhasdasd2.php'
+url = 'http://www.universalstudiospromos.com/happybirthday/regNow.php'
 
 names = json.loads(open('names.json').read())
 
 for name in names:
+	
+	time.sleep(3) 	#exceptions may be raised if too many requests are sent
+	
+	num_extra = ''.join(random.choice(string.digits)) + str(random.randrange(0,99))
+	
+	#uncomment info which applies to the login page
+	
+	#name_extra = ''.join(random.choice(names))
+	#username = name.lower() + name_extra + email_domain[random.randrange(0,4)] #changed from just 'yahoo.ca'
 	name_extra = ''.join(random.choice(string.digits))
+	email = name.lower() + name_extra + num_extra + email_domain[random.randrange(0,4)]
+	#password = ''.join(random.choice(chars) for i in range(8))
 
-	username = name.lower() + name_extra + '@yahoo.com'
-	password = ''.join(random.choice(chars) for i in range(8))
-
-	requests.post(url, allow_redirects=False, data={
-		'auid2yjauysd2uasdasdasd': username,
-		'kjauysd6sAJSDhyui2yasd': password
+	r = requests.post(url, allow_redirects=False, proxies = proxies_dict, data={
+		'name' : name, 
+		'email' : email
 	})
+	
+	#print(r.request.headers,'\n')    #uncomment to see headders sent to the server
+	#print(r.headers,'\n')   	  #uncomment to see headers sent back by the server
 
-	print 'sending username %s and password %s' % (username, password)
+	print 'sending username %s and password %s' % (name, email)
